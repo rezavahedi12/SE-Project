@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AssemblyName>SemnanFlix.Managers</AssemblyName>
+    <RootNamespace>SemnanFlix.Managers</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.2.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SemnanFlix.Accessors\Accessors.csproj" />
+    <ProjectReference Include="..\SemnanFlix.Common\Common.csproj" />
+    <ProjectReference Include="..\SemnanFlix.Engines\Engines.csproj" />
+    <ProjectReference Include="..\SemnanFlix.ViewModels\ViewModels.csproj" />
+  </ItemGroup>
+
+</Project>

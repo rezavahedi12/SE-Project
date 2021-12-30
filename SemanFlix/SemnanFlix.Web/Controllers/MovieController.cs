@@ -1,0 +1,176 @@
+﻿using SemnanFlix.Common.Models;
+using SemnanFlix.Managers.Interfaces;
+using SemnanFlix.ViewModels.Movie;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+
+namespace SemnanFlix.Web.Controllers
+{
+    [Authorize]
+    public class MovieController : Controller
+    {
+        private IAccountManager _accountManager;
+        private IMovieManager _movieManager;
+
+        public MovieController(IAccountManager accountManager,
+            IMovieManager movieManager)
+        {
+            _accountManager = accountManager;
+            _movieManager = movieManager;
+        }
+
+        #region Client
+        public ActionResult ViewAll()
+        {
+            var vm = _movieManager.GetAll();
+            return View(vm);
+        }
+
+        [HttpPost("Search")]
+        public ActionResult Search(string name)
+        {
+            MoviesViewModel vm = new MoviesViewModel();
+            if (name == null || name == "")
+                vm = _movieManager.GetAll();
+            else
+                vm = _movieManager.Search(name);
+            return View(vm);
+
+        }
+
+        public ActionResult ViewAllForUser()
+        {
+            var user = _accountManager.GetApplicationUser(HttpContext.User).Result;
+
+            var vm = _movieManager.GetAllForUser(user.Id);
+
+            return View(vm);
+        }
+
+        public ActionResult View(int id)
+        {
+            var user = _accountManager.GetApplicationUser(HttpContext.User).Result;
+
+            var vm = _movieManager.Get(id, user.Id);
+
+            // Add ReviewAndRating
+            vm.Review = new List<RatingAndReviewViewModel>();
+            vm.Review.AddRange(_movieManager.getReview(id));
+
+            return View(vm);
+        }
+
+        public ActionResult RatingAndReview(RatingAndReviewViewModel model)
+        {
+            var user = _accountManager.GetApplicationUser(HttpContext.User).Result;
+            var vm = _movieManager.Get(model.MovieId, user.Id);
+            vm.Review = new List<RatingAndReviewViewModel>();
+            vm.Review.AddRange(_movieManager.getReview(model.MovieId));
+            if (ModelState.IsValid)
+            {
+                model.Review = user.UserName + " : " + model.Review;
+                _movieManager.RatingAndReview(model);
+
+            }
+            //ModelState.AddModelError(string.Empty, "Your Rate Must Between 1 To 5 & Review Less Than 100 Char!");
+            return View(vm);
+        }
+
+        public ActionResult Purchase(int id)
+        {
+            var user = _accountManager.GetApplicationUser(HttpContext.User).Result;
+
+            _movieManager.Purchase(id, user.Id);
+
+            return RedirectToAction("View", new { id });
+        }
+
+        public ActionResult Rent(int id)
+        {
+            var user = _accountManager.GetApplicationUser(HttpContext.User).Result;
+
+            _movieManager.Rent(id, user.Id);
+
+            return RedirectToAction("View", new { id });
+        }
+        #endregion
+
+        #region Administrator
+        public ActionResult Index(string sortOrder, string search, int? pageIndex, int? pageSize)
+        {
+            var request = new DataTableRequest(this, sortOrder, search, pageIndex, pageSize);
+
+            var vms = _movieManager.GetAllByRequest(request);
+
+            return View(vms);
+        }
+
+        public ActionResult Edit(int? id)
+        {
+            var vm = _movieManager.GetForEditing(id);
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(EditMovieViewModel vm)
+        {
+            if (ModelState.IsValid)
+            {
+                _movieManager.Save(vm);
+                return RedirectToAction("Index");
+            }
+
+            return View(vm);
+        }
+
+        public ActionResult Delete(int id)
+        {
+            var user = _accountManager.GetApplicationUser(HttpContext.User).Result;
+
+            var vm = _movieManager.Get(id, user.Id);
+
+            return View(vm);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            _movieManager.Delete(id);
+
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult AddCastMember(int index)
+        {
+            var vm = new CastMemberViewModel { Index = index, Order = index };
+
+            ViewData.TemplateInfo.HtmlFieldPrefix = string.Format("Cast[{0}]", index);
+
+            return PartialView("../Movie/EditorTemplates/CastMemberViewModel", vm);
+        }
+
+        public ActionResult AddCrewMember(int index)
+        {
+            var vm = new CrewMemberViewModel { Index = index };
+
+            ViewData.TemplateInfo.HtmlFieldPrefix = string.Format("Crew[{0}]", index);
+
+            return PartialView("../Movie/EditorTemplates/CrewMemberViewModel", vm);
+        }
+
+        public string GetPersonSelectData(string query)
+        {
+            return _movieManager.GetPersonSelectData(query);
+        }
+
+        public string GetDepartmentSelectData(string query)
+        {
+            return _movieManager.GetDepartmentSelectData(query);
+        }
+        #endregion
+    }
+}

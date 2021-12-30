@@ -1,0 +1,60 @@
+﻿using SemnanFlix.Common.Models;
+using SemnanFlix.Managers.Interfaces;
+using Microsoft.Extensions.Options;
+using System.Net;
+using System.Net.Mail;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
+
+namespace SemnanFlix.Managers.Managers
+{
+    //This class is used by the application to send email for account confirmation and password reset
+    //For more details, see https://go.microsoft.com/fwlink/?LinkID=532713
+    public class EmailManager : IEmailManager
+    {
+        public EmailConfiguration _emailConfiguration { get; }
+
+        public EmailManager(IOptions<EmailConfiguration> emailConfiguration)
+        {
+            _emailConfiguration = emailConfiguration.Value;
+        }
+
+        public Task SendEmailAsync(string email, string subject, string message)
+        {
+            //var client = new SmtpClient
+            //{
+            //    Host = _emailConfiguration.MailServer,
+            //    Port = _emailConfiguration.MailServerPort,
+            //    Credentials = new NetworkCredential("Zeinabshirazi02@gmail.com", "0023469099"),
+            //    EnableSsl = _emailConfiguration.EnableSsl
+            //};
+
+  
+            SmtpClient client = new SmtpClient();
+            client.Credentials = new System.Net.NetworkCredential("Zeinabshirazi02@gmail.com", "0023469099");
+            client.Host = "smtp.gmail.com";
+            client.Port = 587;
+            client.EnableSsl = true;
+
+            var mail = new MailMessage
+            {
+                From = new MailAddress(_emailConfiguration.SenderEmail, _emailConfiguration.SenderName),
+                Subject = subject,
+                Body = message,
+                IsBodyHtml = true
+            };
+
+            mail.To.Add(email);
+            client.Send(mail);
+            client.Dispose();
+
+            return Task.CompletedTask;
+        }
+
+        public Task SendEmailConfirmationAsync(string email, string link)
+        {
+            return SendEmailAsync(email, "Confirm your email",
+                $"Please confirm your account by clicking <a href='{HtmlEncoder.Default.Encode(link)}'>here</a>.");
+        }
+    }
+}

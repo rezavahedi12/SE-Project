@@ -1,0 +1,76 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<OutputType>Exe</OutputType>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<TargetFramework>netcoreapp2.2</TargetFramework>
+		<TypeScriptToolsVersion>2.8</TypeScriptToolsVersion>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<UserSecretsId>aspnet-SemnanFlix-e91132e6-85a2-421c-a63d-b0ed9cc0c64f</UserSecretsId>
+		<ApplicationIcon>wwwroot\favicon.ico</ApplicationIcon>
+		<OutputTypeEx>library</OutputTypeEx>
+		<StartupObject></StartupObject>
+		<AssemblyName>SemnanFlix.Web</AssemblyName>
+		<RootNamespace>SemnanFlix.Web</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Remove="Config\SeedData\departments.json" />
+		<Content Remove="Config\SeedData\genres.json" />
+		<Content Remove="Config\SeedData\movies.json" />
+		<Content Remove="Config\SeedData\people.json" />
+		<Content Remove="wwwroot\.gitignore" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.All" Version="2.2.7" />
+		<PackageReference Include="AutoMapper" Version="7.0.1" />
+		<PackageReference Include="BuildBundlerMinifier" Version="2.8.391" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.Elm" Version="0.2.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.6" />
+		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="1.0.113" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="Config\SeedData\departments.json" />
+		<None Include="Config\SeedData\genres.json" />
+		<None Include="Config\SeedData\movies.json" />
+		<None Include="Config\SeedData\people.json" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\SemnanFlix.Common\Common.csproj" />
+		<ProjectReference Include="..\SemnanFlix.Managers\Managers.csproj" />
+		<ProjectReference Include="..\SemnanFlix.ViewModels\ViewModels.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Folder Include="wwwroot\lib\bootstrap-select\css\" />
+		<Folder Include="wwwroot\lib\bootstrap\css\" />
+		<Folder Include="wwwroot\lib\bootstrap\js\" />
+		<Folder Include="wwwroot\lib\jquery\" />
+		<Folder Include="wwwroot\lib\tinysort\" />
+	</ItemGroup>
+	<ItemGroup>
+		<Content Update="Views\Movie\ViewAllForUser.cshtml">
+			<Pack>$(IncludeRazorContentInPack)</Pack>
+		</Content>
+		<Content Update="Views\Shared\_MovieCardList.cshtml">
+			<Pack>$(IncludeRazorContentInPack)</Pack>
+		</Content>
+		<Content Update="Views\Shared\_DataTableTitle.cshtml">
+			<Pack>$(IncludeRazorContentInPack)</Pack>
+		</Content>
+		<Content Update="Views\Shared\_SortableHeader.cshtml">
+			<Pack>$(IncludeRazorContentInPack)</Pack>
+		</Content>
+		<Content Update="Views\Shared\_SearchToolbar.cshtml">
+			<Pack>$(IncludeRazorContentInPack)</Pack>
+		</Content>
+		<Content Update="Views\Shared\_PaginationToolbar.cshtml">
+			<Pack>$(IncludeRazorContentInPack)</Pack>
+		</Content>
+	</ItemGroup>
+
+</Project>
